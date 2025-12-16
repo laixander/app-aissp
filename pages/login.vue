@@ -53,7 +53,7 @@
                     </div>
 
                     <!-- <UButton label="Login" size="lg" block @click="emit('login')" :loading="loading" /> -->
-                    <UButton label="Login" type="submit" size="lg" :loading="loading" to="/dashboard" block />
+                    <UButton label="Login" type="submit" size="lg" :loading="loading" block />
 
                     <p v-if="error" class="text-red-500 text-sm">{{ error }}</p>
                 </UForm>
