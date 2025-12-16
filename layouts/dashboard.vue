@@ -217,7 +217,7 @@ const userItems = ref<DropdownMenuItem[][]>([
         {
             label: 'Profile',
             icon: 'i-lucide-user',
-            to: '/profile'
+            to: '/'
         },
         // {
         //     label: 'Settings',

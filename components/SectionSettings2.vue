@@ -31,7 +31,7 @@
                         <UButton label="Save Section" size="lg" />
                     </div>
                 </div>
-                <TipTapEditor />
+                <TipTapEditor @close="close" />
             </div>
         </template>
     </UModal>

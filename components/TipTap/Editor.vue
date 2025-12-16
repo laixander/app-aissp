@@ -1,5 +1,5 @@
 <template>
-    <div class="flex h-full divide-x divide-gray-200 dark:divide-gray-800">
+    <div class="flex w-full h-full divide-x divide-gray-200 dark:divide-gray-800">
         <div v-if="editor" class="flex flex-col flex-1 divide-y divide-gray-200 dark:divide-gray-800">
             <TipTapButtons :editor="editor" />
 
