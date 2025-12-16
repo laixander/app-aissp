@@ -12,8 +12,7 @@ export default defineNuxtConfig({
     modules: [
       '@nuxt/ui',
       '@nuxt/image',
-      'nuxt-jsoneditor',
-      '@nuxthub/core'
+      'nuxt-jsoneditor'
     ],
     css: ['~/assets/css/main.css'],
     jsoneditor: {
