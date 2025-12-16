@@ -1,87 +1,160 @@
 <template>
-    <Page page-title="Dashboard" page-description="Overview of your ISSP management activities">
-        <template #actions>
-            <UButton label="Export Report" icon="i-lucide-download" size="lg" color="neutral" variant="outline"
-                class="w-full md:w-auto justify-center" />
-            <!-- Modal -->
-            <FormNewDocument />
-        </template>
-        <template #content>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <CardWidget v-for="(widget, index) in widgets" :key="index" v-bind="widget" />
-            </div>
+    <div class="min-h-screen w-full flex flex-col items-center gap-6 lg:flex-row bg-white dark:bg-gray-950 relative"
+        :class="computedLoginPosition === 'right' ? 'lg:justify-end' : 'lg:justify-start'">
+        <!-- Background Image for Large Screens -->
+        <div v-if="!isSmallScreen" class="hidden lg:block absolute inset-0 bg-cover bg-left"
+            :style="{ backgroundImage: `url(${computedBgImage})` }"></div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Block title="Recent Activity" description="Latest actions across all entities" icon="i-lucide-clock">
-                    <template #content>
-                        <div class="space-y-4">
-                            <CardActivity v-for="(activity, index) in activityCards" :key="index" v-bind="activity" />
-                        </div>
-                    </template>
-                </Block>
+        <!-- Overlay -->
+        <div v-if="!isSmallScreen" class="hidden lg:block absolute inset-0" :class="gradientClass"></div>
 
-                <Block title="Approval Queue" description="Documents awaiting your review" icon="i-lucide-circle-alert">
-                    <template #content>
-                        <div class="space-y-4">
-                            <CardQueue v-for="(item, index) in queueCards" :key="index" v-bind="item" />
-                        </div>
-                    </template>
-                </Block>
-            </div>
+        <!-- Login -->
+        <div class="w-full lg:w-1/2 flex justify-center items-center p-4 order-last relative z-10">
+            <div class="max-w-xs w-full space-y-4 text-center">
+                <!-- Dynamic Logo -->
+                <NuxtImg v-if="computedLogo" :src="computedLogo" alt="Digital Solution" width="80" height="80"
+                    class="mx-auto" />
 
-            <Block title="AI Suggestions" description="Smart recommendations to improve your ISSPs" icon="i-lucide-bot"
-                icon-color="text-purple-500">
-                <template #content>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <UAlert title="Content Enhancement"
-                            description="3 documents could benefit from expanded strategic objectives" color="violet"
-                            variant="subtle" :ui="{ title: 'text-md' }" :actions="[
-                                {
-                                    label: 'Review Suggestions',
-                                    color: 'violet',
-                                    variant: 'subtle',
-                                    size: 'lg'
-                                }
-                            ]" />
-                        <UAlert title="Compliance Check" description="2 ISSPs need DICT guideline alignment updates"
-                            color="secondary" variant="subtle" :ui="{ title: 'text-md' }" :actions="[
-                                {
-                                    label: 'View Details',
-                                    color: 'secondary',
-                                    variant: 'subtle',
-                                    size: 'lg'
-                                }
-                            ]" />
-                        <UAlert title="Budget Optimization"
-                            description="Potential savings of ₱2.3M identified across 5 entities" color="success"
-                            variant="subtle" :ui="{ title: 'text-md' }" :actions="[
-                                {
-                                    label: 'Explore Options',
-                                    color: 'success',
-                                    variant: 'subtle',
-                                    size: 'lg'
-                                }
-                            ]" />
+                <!-- Dynamic Title -->
+                <header class="space-y-2">
+                    <h1 class="font-extralight text-3xl text-gray-800 dark:text-gray-50">
+                        {{ title || "Welcome Back!" }}
+                    </h1>
+                    <p class="font-light text-sm text-gray-500 dark:text-gray-400">
+                        {{ description || "Please login to continue" }}
+                    </p>
+                </header>
+
+                <UForm :state="formState" @submit="handleLogin" class="space-y-4">
+
+                    <UFormField label="Username" name="username" size="lg">
+                        <UInput v-model="formState.username" class="w-full" />
+                    </UFormField>
+
+                    <UFormField label="Password" name="password" size="lg">
+                        <UInput v-model="formState.password" :type="showPassword ? 'text' : 'password'" class="w-full"
+                            :ui="{ trailing: 'pe-1' }">
+                            <template #trailing>
+                                <UButton color="neutral" variant="link" size="sm"
+                                    :icon="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                                    :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                                    @click.prevent="togglePassword" />
+                            </template>
+                        </UInput>
+                    </UFormField>
+
+
+                    <div class="flex justify-between items-center">
+                        <UCheckbox name="remember" label="Remember Me" />
+                        <ULink to="#"
+                            class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                            Forgot Password?
+                        </ULink>
                     </div>
-                </template>
-            </Block>
 
-            <Block title="System-wide Progress" description="Overall completion status across all entities">
-                <template #content>
-                    <div class="space-y-4">
-                        <BaseProgress v-for="(item, index) in progressBars" :key="index" v-bind="item" color="neutral" />
-                    </div>
-                </template>
-            </Block>
-        </template>
-    </Page>
+                    <!-- <UButton label="Login" size="lg" block @click="emit('login')" :loading="loading" /> -->
+                    <UButton label="Login" type="submit" size="lg" :loading="loading" to="/dashboard" block />
+
+                    <p v-if="error" class="text-red-500 text-sm">{{ error }}</p>
+                </UForm>
+            </div>
+        </div>
+
+        <!-- Background Image for Small Screens -->
+        <div v-if="isSmallScreen" class="w-full h-[120px] bg-cover bg-center lg:hidden"
+            :style="{ backgroundImage: `url(${computedBgImage})` }"></div>
+    </div>
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-    layout: 'dashboard',
+const showPassword = ref(false)
+const togglePassword = () => {
+    showPassword.value = !showPassword.value
+}
+// Handle Auth
+const formState = reactive({
+    username: '',
+    password: ''
 })
+const error = ref('')
+const loading = ref(false)
 
-import { widgets, activityCards, queueCards } from '~/data/cards'
-import { progressBars } from '~/data/components'
+// const router = useRouter()
+// const { login } = useAuth()
+
+const handleLogin = async () => {
+    loading.value = true
+    error.value = ''
+
+    const { username, password } = formState
+
+    await new Promise((r) => setTimeout(r, 500))
+
+    if (username === 'admin' && password === 'password') {
+        // login({ username })
+        // router.push('/')
+    } else {
+        error.value = 'Invalid username or password'
+    }
+
+    loading.value = false
+}
+
+// Handle Content
+import { computed } from "vue";
+import { useWindowSize } from "@vueuse/core";
+
+const { width } = useWindowSize();
+const isSmallScreen = computed(() => width.value < 1024);
+
+const props = defineProps<{
+    logo?: string;
+    bgImage?: string;
+    title?: string;
+    description?: string;
+    position?: "right" | "left";
+    styleType?: "diagonal" | "straight";
+}>();
+
+const computedLogo = computed(() => props.logo || "assets/logo.png");
+const computedBgImage = computed(() => props.bgImage || randomImage);
+const computedLoginPosition = computed(() => props.position ?? 'right');
+
+const gradientClass = computed(() => {
+    const styles = {
+        diagonal: {
+            right: "bg-[linear-gradient(108deg,transparent_0%,transparent_49.96%,white_50%,white_100%)] dark:bg-[linear-gradient(108deg,transparent_0%,transparent_49.96%,#0f172a_50%,#0f172a_100%)]",
+            left: "bg-[linear-gradient(-108deg,transparent_0%,transparent_49.96%,white_50%,white_100%)] dark:bg-[linear-gradient(-108deg,transparent_0%,transparent_49.96%,#0f172a_50%,#0f172a_100%)]",
+        },
+        straight: {
+            right: "bg-[linear-gradient(90deg,transparent_0%,transparent_49.96%,white_50%,white_100%)] dark:bg-[linear-gradient(90deg,transparent_0%,transparent_49.96%,#0f172a_50%,#0f172a_100%)]",
+            left: "bg-[linear-gradient(-90deg,transparent_0%,transparent_49.96%,white_50%,white_100%)] dark:bg-[linear-gradient(-90deg,transparent_0%,transparent_49.96%,#0f172a_50%,#0f172a_100%)]",
+        },
+    };
+
+    // Ensure `props.styleType` and `props.position` have default values
+    const styleType = props.styleType ?? "straight";
+    const position = props.position ?? "right";
+
+    return styles[styleType][position]; // Safe indexing
+});
+
+const bgImages = [
+    "https://images.unsplash.com/photo-1668763263612-24fe81663e8a",
+    "https://images.unsplash.com/photo-1708844897353-649da595a3f2",
+    "https://images.unsplash.com/photo-1659952586072-b3cebadec6d2",
+    "https://images.unsplash.com/photo-1710781944947-7cd4a381499f",
+    "https://images.unsplash.com/photo-1699100329878-7f28bb780787",
+    "https://images.unsplash.com/photo-1700116035176-99d81e11c60b"
+    // Add as many as you want
+];
+
+const randomImage = bgImages[Math.floor(Math.random() * bgImages.length)];
 </script>
+
+<style lang="css" scoped>
+/* Hide the password reveal button in Edge */
+::-ms-reveal {
+    display: none;
+}
+</style>
