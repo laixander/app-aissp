@@ -28,7 +28,27 @@ jobs:
       - name: Ensure NuxtHub module is installed
         run: bunx nuxthub@latest ensure
 
-      - name: Build & Deploy to NuxtHub
-        uses: nuxt-hub/action@v2
-        with:
-          project-key: app-aissp-4dkl
+      - name: Build Nuxt
+        run: |
+          # Build Nuxt/Nitro (use nuxi via bunx)
+          bunx nuxi build
+
+      - name: Prepare dist directory for NuxtHub
+        run: |
+          # Prefer static public output if present (for static deployments)
+          if [ -d .output/public ]; then
+            rm -rf dist
+            cp -r .output/public dist
+            echo "Prepared dist from .output/public"
+          else
+            # Fallback: copy entire .output (for server deployments)
+            rm -rf dist
+            cp -r .output dist
+            echo "Prepared dist from .output"
+          fi
+
+      - name: Deploy to NuxtHub (CLI)
+        run: |
+          # Use the NuxtHub CLI to deploy the prepared dist directory
+          # Adjust --dir if you prefer .output/server instead of dist
+          bunx nuxthub@latest deploy --project-key=app-aissp-4dkl --dir=dist
