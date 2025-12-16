@@ -9,7 +9,12 @@ export default defineNuxtConfig({
     },
     compatibilityDate: '2025-05-15',
     devtools: { enabled: true },
-    modules: ['@nuxt/ui', '@nuxt/image', 'nuxt-jsoneditor'],
+    modules: [
+      '@nuxt/ui',
+      '@nuxt/image',
+      'nuxt-jsoneditor',
+      '@nuxthub/core'
+    ],
     css: ['~/assets/css/main.css'],
     jsoneditor: {
         componentName: 'JsonEditor', 
@@ -34,5 +39,8 @@ export default defineNuxtConfig({
                 'purple',
             ]
         }
+    },
+    nitro: {
+        preset: 'node-server'
     }
 })
