@@ -38,8 +38,5 @@ export default defineNuxtConfig({
                 'purple',
             ]
         }
-    },
-    nitro: {
-        preset: 'node-server'
     }
 })
